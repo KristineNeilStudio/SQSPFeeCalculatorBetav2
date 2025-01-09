@@ -18,6 +18,7 @@ interface BusinessMetricsSectionProps {
   metrics: Metrics;
   setMetrics: React.Dispatch<React.SetStateAction<Metrics>>;
   onCalculate: () => void;
+  onReset: () => void;
   calculateDisabled: boolean;
 }
 
