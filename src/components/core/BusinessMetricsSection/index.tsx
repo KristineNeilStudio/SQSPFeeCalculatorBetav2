@@ -281,8 +281,9 @@ const BusinessMetricsSection: React.FC<BusinessMetricsSectionProps> = ({
             />
             <div>
               <div className="font-medium text-gray-900">Physical Products</div>
-              <div className="text-sm text-gray-600">
-                Do you sell physical products?
+              <div className="text-xs text-gray-500 mt-1">
+                Includes physical items and downloads (available as one-time
+                purchases or subscriptions), plus services and gift cards.
               </div>
             </div>
           </label>
@@ -299,8 +300,10 @@ const BusinessMetricsSection: React.FC<BusinessMetricsSectionProps> = ({
             />
             <div>
               <div className="font-medium text-gray-900">Digital Products</div>
-              <div className="text-sm text-gray-600">
-                Do you sell digital products?
+              <div className="text-xs text-gray-500 mt-1">
+                Includes course pages, monetized blogs, video content, and
+                member sites - available as one-time purchases or subscriptions
+                with immediate access.
               </div>
             </div>
           </label>
