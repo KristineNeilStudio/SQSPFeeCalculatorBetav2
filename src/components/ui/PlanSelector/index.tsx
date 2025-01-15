@@ -73,7 +73,7 @@ const PlanSelector: React.FC<PlanSelectorProps> = ({ planSet, setPlanSet }) => {
             />
             <div className="flex-1">
               <div className="text-base font-semibold text-gray-900 mb-1">
-                Legacy Plans (Prior to Nov 2024)
+                Legacy Plans (Prior to 2025)
               </div>
               <div className="text-sm text-gray-600">
                 Personal, Business, Basic Commerce, Advanced Commerce
