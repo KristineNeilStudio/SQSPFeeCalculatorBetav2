@@ -3,7 +3,7 @@ interface AnnouncementBarProps {
 }
 
 const AnnouncementBar: React.FC<AnnouncementBarProps> = ({
-  message = "The BETA version is best experienced on desktop. Mobile updates coming soon!",
+  message = "Jan 2025 Updates: Style Improvements & Plan Updates",
 }) => {
   return (
     <div className="bg-accent-redLight text-accent-red py-3 px-4 text-center relative z-50 flex justify-center items-center shadow-sm mb-4">

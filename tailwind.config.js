@@ -1,5 +1,5 @@
 /** @type {import('tailwindcss').Config} */
-export default {
+module.exports = {
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
     extend: {
@@ -27,8 +27,6 @@ export default {
         sans: ["Open Sans", "system-ui", "sans-serif"],
         display: ["Open Sans", "system-ui", "sans-serif"],
         mono: [
-          "JetBrains Mono",
-          "IBM Plex Mono",
           "ui-monospace",
           "SFMono-Regular",
           "Menlo",

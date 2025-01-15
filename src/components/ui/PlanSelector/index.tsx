@@ -1,89 +1,87 @@
-import React from "react";
+import React, { useState } from "react";
+import { ChevronDown } from "lucide-react";
 
 interface PlanSelectorProps {
   planSet: "current" | "new";
   setPlanSet: (plan: "current" | "new") => void;
 }
 
-interface RadioOptionProps {
-  id: string;
-  value: "current" | "new";
-  checked: boolean;
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  title: React.ReactNode;
-  description: string;
-}
-
-const RadioOption: React.FC<RadioOptionProps> = ({
-  id,
-  value,
-  checked,
-  onChange,
-  title,
-  description,
-}) => {
-  return (
-    <label
-      htmlFor={id}
-      className={`block p-4 mb-2 border rounded-lg cursor-pointer transition-colors
-        ${
-          checked
-            ? "bg-gray-50 border-gray-300"
-            : "bg-white border-gray-200 hover:bg-gray-50"
-        }`}
-    >
-      <div className="flex items-start gap-3">
-        <input
-          type="radio"
-          id={id}
-          name="planSet"
-          value={value}
-          checked={checked}
-          onChange={onChange}
-          className="mt-1"
-        />
-        <div className="flex-1">
-          <div className="text-base font-semibold text-gray-900 mb-1">
-            {title}
-          </div>
-          <div className="text-sm text-gray-600">{description}</div>
-        </div>
-      </div>
-    </label>
-  );
-};
-
 const PlanSelector: React.FC<PlanSelectorProps> = ({ planSet, setPlanSet }) => {
+  const [showLegacy, setShowLegacy] = useState(false);
+
+  // Set default selection to "new" when component mounts
+  React.useEffect(() => {
+    if (planSet !== "new") {
+      setPlanSet("new");
+    }
+  }, []);
+
   return (
     <div className="mb-6">
       <h3 className="text-lg font-semibold mb-4 text-gray-900">
-        Which plan options do you see?
+        Squarespace Plan Options
       </h3>
 
-      <RadioOption
-        id="new"
-        value="new"
-        checked={planSet === "new"}
-        onChange={(e) => setPlanSet(e.target.value as "current" | "new")}
-        title={
-          <div className="relative pr-24">
-            Current Plans
-            <span className="absolute -top-6 right-0 bg-primary-lightest text-primary-dark text-xs font-semibold px-2 py-1 rounded-lg border border-primary-dark">
-              Recommended
-            </span>
+      {/* Main plan option - always visible */}
+      <div className="block p-4 mb-4 border border-accent-red rounded-lg bg-accent-redLight bg-opacity-5">
+        <div className="flex items-start gap-3">
+          <input
+            type="radio"
+            id="new"
+            name="planSet"
+            value="new"
+            checked={planSet === "new"}
+            onChange={(e) => setPlanSet(e.target.value as "current" | "new")}
+            className="mt-1"
+          />
+          <div className="flex-1">
+            <div className="text-base font-semibold text-gray-900 mb-1">
+              Current Plans
+            </div>
+            <div className="text-sm text-gray-600">
+              Basic, Core, Plus, Advanced
+            </div>
           </div>
-        }
-        description="Basic, Core, Plus, Advanced"
-      />
+        </div>
+      </div>
 
-      <RadioOption
-        id="current"
-        value="current"
-        checked={planSet === "current"}
-        onChange={(e) => setPlanSet(e.target.value as "current" | "new")}
-        title="Old Plans (Prior to Nov 2024)"
-        description="Personal, Business, Basic Commerce, Advanced Commerce"
-      />
+      {/* Legacy plan toggle */}
+      <button
+        onClick={() => setShowLegacy(!showLegacy)}
+        className="w-full flex items-center justify-between p-2 text-sm text-gray-500 hover:text-gray-700"
+      >
+        <span>Looking for legacy plans?</span>
+        <ChevronDown
+          className={`w-4 h-4 transform transition-transform ${
+            showLegacy ? "rotate-180" : ""
+          }`}
+        />
+      </button>
+
+      {/* Legacy plan option - collapsible */}
+      {showLegacy && (
+        <div className="mt-2 p-4 border border-gray-200 rounded-lg bg-gray-50">
+          <div className="flex items-start gap-3">
+            <input
+              type="radio"
+              id="current"
+              name="planSet"
+              value="current"
+              checked={planSet === "current"}
+              onChange={(e) => setPlanSet(e.target.value as "current" | "new")}
+              className="mt-1"
+            />
+            <div className="flex-1">
+              <div className="text-base font-semibold text-gray-900 mb-1">
+                Legacy Plans (Prior to Nov 2024)
+              </div>
+              <div className="text-sm text-gray-600">
+                Personal, Business, Basic Commerce, Advanced Commerce
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
