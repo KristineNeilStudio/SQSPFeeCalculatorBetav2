@@ -2,22 +2,19 @@
 import type { ForwardRefRenderFunction } from "react";
 import { forwardRef } from "react";
 import { RotateCcw } from "lucide-react";
-import { groupBy } from "lodash";
 
 // Types
 interface FeeBreakdown {
   monthlySubscription: number;
   annualSubscription: number;
-  monthlyDpPlan?: number;
-  annualDpPlan?: number;
   processingFees: number;
   physicalPlatformFee?: number;
   digitalPlatformFee: number;
+  transactionFees?: number; // Added for Basic plan transaction fee
 }
 
 interface FeeResult {
   plan: string;
-  dpPlan?: string;
   processor: string;
   processors?: string[];
   isGrouped?: boolean;
@@ -36,7 +33,7 @@ interface ResultsSectionProps {
   onReset: () => void;
 }
 
-const formatCurrency = (value: number): string => {
+const formatCurrency = (value: number = 0): string => {
   return value.toLocaleString("en-US", {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
@@ -74,13 +71,6 @@ const ResultCard: React.FC<ResultCardProps> = ({ result, index }) => {
                 </span>
               )}
             </div>
-            {result.dpPlan && result.dpPlan !== "No DP Plan" && (
-              <div className="flex flex-wrap gap-1.5">
-                <span className="inline-flex px-2 py-0.5 text-xs bg-accent-redLight text-accent-red rounded-lg border border-accent-red tracking-wide whitespace-nowrap">
-                  Digital Products {result.dpPlan} Plan
-                </span>
-              </div>
-            )}
           </div>
         </div>
 
@@ -104,32 +94,36 @@ const ResultCard: React.FC<ResultCardProps> = ({ result, index }) => {
                 ${formatCurrency(result.breakdown.monthlySubscription)}
               </span>
             </div>
-            {result.breakdown.monthlyDpPlan !== undefined && (
-              <div className="flex justify-between text-sm text-primary-medium py-1">
-                <span>Digital Products Subscription</span>
-                <span className="font-mono">
-                  ${formatCurrency(result.breakdown.monthlyDpPlan)}
-                </span>
-              </div>
-            )}
           </div>
 
           <div className="mb-4">
             <div className="text-sm font-medium text-primary-medium mb-2">
               Platform Fees
             </div>
-            <div className="flex justify-between text-sm text-primary-medium py-1">
-              <span>Physical Product Platform Fee</span>
-              <span className="font-mono">
-                ${formatCurrency(result.breakdown.physicalPlatformFee || 0)}
-              </span>
-            </div>
-            <div className="flex justify-between text-sm text-primary-medium py-1">
-              <span>Digital Product Platform Fee</span>
-              <span className="font-mono">
-                ${formatCurrency(result.breakdown.digitalPlatformFee)}
-              </span>
-            </div>
+            {result.breakdown.transactionFees && result.breakdown.transactionFees > 0 && (
+              <div className="flex justify-between text-sm text-primary-medium py-1">
+                <span>Online Store Transaction Fee (2%)</span>
+                <span className="font-mono">
+                  ${formatCurrency(result.breakdown.transactionFees)}
+                </span>
+              </div>
+            )}
+            {(result.breakdown.physicalPlatformFee || 0) > 0 && (
+              <div className="flex justify-between text-sm text-primary-medium py-1">
+                <span>Physical Product Platform Fee</span>
+                <span className="font-mono">
+                  ${formatCurrency(result.breakdown.physicalPlatformFee)}
+                </span>
+              </div>
+            )}
+            {result.breakdown.digitalPlatformFee > 0 && (
+              <div className="flex justify-between text-sm text-primary-medium py-1">
+                <span>Digital Product Platform Fee</span>
+                <span className="font-mono">
+                  ${formatCurrency(result.breakdown.digitalPlatformFee)}
+                </span>
+              </div>
+            )}
           </div>
 
           <div className="mb-4">
@@ -166,14 +160,7 @@ const ResultCard: React.FC<ResultCardProps> = ({ result, index }) => {
               <div className="text-sm text-primary-darkest leading-relaxed">
                 Save $
                 {formatCurrency(result.monthlyCost * 12 - result.annualCost)}{" "}
-                per year on {result.plan}
-                {result.dpPlan && result.dpPlan !== "No DP Plan"
-                  ? ` plus $${formatCurrency(
-                      (result.breakdown.monthlyDpPlan || 0) * 12 -
-                        (result.breakdown.annualDpPlan || 0) * 12
-                    )} on your Digital Products ${result.dpPlan} plan`
-                  : ""}{" "}
-                with annual billing.
+                per year on {result.plan} with annual billing.
               </div>
             </div>
           </div>
@@ -189,22 +176,8 @@ const ResultsSection: ForwardRefRenderFunction<
 > = ({ feeResults, onReset }, ref) => {
   if (!feeResults) return null;
 
-  const groupedResults = groupBy(
-    feeResults,
-    (result: FeeResult) =>
-      `${result.plan}-${result.dpPlan || "noDp"}-${result.monthlyCost}`
-  );
-
-  const consolidatedResults = Object.values(groupedResults)
-    .map((group: FeeResult[]) => ({
-      ...group[0],
-      processors: group.map((r) => r.processor),
-      isGrouped: group.length > 1,
-    }))
-    .slice(0, 2);
-
-  const mainResult = consolidatedResults[0];
-  const alternativeResult = consolidatedResults[1];
+  const mainResult = feeResults[0];
+  const alternativeResult = feeResults.length > 1 ? feeResults[1] : null;
 
   return (
     <div ref={ref} className="w-full max-w-7xl mx-auto">

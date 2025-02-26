@@ -1,20 +1,27 @@
+// src/components/core/VideoStorageCalculator/index.tsx
 import { BaseSection, SectionTitle } from "../../ui/BaseSection";
-import { STORAGE_OPTIONS } from "../../../constants/storageRules";
 import React from "react";
 
+interface StorageOption {
+  value: string;
+  label: string;
+}
+
 interface VideoStorageCalculatorProps {
-  planSet: "current" | "new";
   storageValue: string;
   onStorageChange: (data: { storage: string }) => void;
 }
 
+const STORAGE_OPTIONS: StorageOption[] = [
+  { value: "none", label: "None (Up to 5 hours included)" },
+  { value: "5-50", label: "5-50 hours" },
+  { value: "50+", label: "Unlimited" },
+];
+
 const VideoStorageCalculator: React.FC<VideoStorageCalculatorProps> = ({
-  planSet,
   storageValue,
   onStorageChange,
 }) => {
-  const storageOptions = STORAGE_OPTIONS[planSet];
-
   return (
     <BaseSection>
       <SectionTitle>Video Storage Needs</SectionTitle>
@@ -29,7 +36,7 @@ const VideoStorageCalculator: React.FC<VideoStorageCalculatorProps> = ({
                    bg-white focus:border-accent-red focus:ring-1 focus:ring-accent-red outline-none
                    transition-colors duration-200"
         >
-          {storageOptions.map((option) => (
+          {STORAGE_OPTIONS.map((option) => (
             <option key={option.value} value={option.value}>
               {option.label}
             </option>

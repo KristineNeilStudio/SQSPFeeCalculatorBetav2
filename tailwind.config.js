@@ -24,16 +24,9 @@ module.exports = {
         },
       },
       fontFamily: {
-        sans: ["Open Sans", "system-ui", "sans-serif"],
-        display: ["Open Sans", "system-ui", "sans-serif"],
-        mono: [
-          "ui-monospace",
-          "SFMono-Regular",
-          "Menlo",
-          "Monaco",
-          "Consolas",
-          "monospace",
-        ],
+        sans: ['"Source Sans Pro"', 'system-ui', 'sans-serif'],
+        display: ['"JetBrains Mono"', 'monospace'],
+        mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'monospace'],
       },
       boxShadow: {
         calculator:

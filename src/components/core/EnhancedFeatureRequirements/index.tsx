@@ -1,16 +1,17 @@
+// src/components/core/EnhancedFeatureRequirements/index.tsx
 import React from "react";
 import { BaseSection, SectionTitle } from "../../ui/BaseSection";
-import { COMMERCE_FEATURES } from "../../../constants/featureRequirements";
 
+// Types
 interface Feature {
-  id: string;
+  id: keyof Features;
   label: string;
   description: string;
   minPlan: string;
-  processorRestrictions?: string[];
+  tier: "basic" | "core" | "plus";
 }
 
-interface Features {
+export interface Features {
   needsSubscriptions: boolean;
   needsAbandonedCart: boolean;
   needsAdvancedShipping: boolean;
@@ -26,8 +27,81 @@ interface Features {
 interface EnhancedFeatureRequirementsProps {
   features: Features;
   setFeatures: (features: Features) => void;
-  planSet: "current" | "new";
 }
+
+// Feature definitions
+const COMMERCE_FEATURES: Feature[] = [
+  {
+    id: "needsSubscriptions",
+    label: "Subscription Products",
+    description: "Sell products on a recurring basis",
+    minPlan: "Basic",
+    tier: "basic"
+  },
+  {
+    id: "needsAbandonedCart",
+    label: "Abandoned Cart Recovery",
+    description: "Automatically follow up on abandoned carts",
+    minPlan: "Core",
+    tier: "core"
+  },
+  {
+    id: "needsAdvancedShipping",
+    label: "Advanced Shipping Rules",
+    description: "Complex shipping rates and rules",
+    minPlan: "Basic",
+    tier: "basic"
+  },
+  {
+    id: "sellsDigitalProducts",
+    label: "Digital Products",
+    description: "Sell digital downloads, courses, or content",
+    minPlan: "Basic",
+    tier: "basic"
+  },
+  {
+    id: "needsPOS",
+    label: "Point of Sale (POS)",
+    description: "Sell in-person with Square POS integration",
+    minPlan: "Core",
+    tier: "core"
+  },
+  {
+    id: "needsProductReviews",
+    label: "Product Reviews",
+    description: "Allow customers to leave product reviews",
+    minPlan: "Core",
+    tier: "core"
+  },
+  {
+    id: "needsAdvancedMerchandising",
+    label: "Advanced Merchandising",
+    description: "Enhanced product presentation tools",
+    minPlan: "Core",
+    tier: "core"
+  },
+  {
+    id: "needsLimitedAvailability",
+    label: "Limited Availability Labels",
+    description: "Show stock levels and urgency indicators",
+    minPlan: "Basic",
+    tier: "basic"
+  },
+  {
+    id: "needsAdvancedDiscounts",
+    label: "Advanced Discounts",
+    description: "Complex discount rules and promotions",
+    minPlan: "Core",
+    tier: "core"
+  },
+  {
+    id: "needsCommerceAPI",
+    label: "Commerce API Access",
+    description: "Programmatic access to commerce functionality",
+    minPlan: "Plus",
+    tier: "plus"
+  },
+];
 
 const CheckboxOption: React.FC<{
   id: string;
@@ -61,11 +135,7 @@ const CheckboxOption: React.FC<{
 
 const EnhancedFeatureRequirements: React.FC<
   EnhancedFeatureRequirementsProps
-> = ({ features, setFeatures, planSet }) => {
-  if (planSet !== "current") {
-    return null;
-  }
-
+> = ({ features, setFeatures }) => {
   const handleFeatureChange = (featureId: keyof Features, checked: boolean) => {
     setFeatures({
       ...features,
@@ -73,26 +143,17 @@ const EnhancedFeatureRequirements: React.FC<
     });
   };
 
-  const allFeatures = [
-    ...COMMERCE_FEATURES.basic,
-    ...COMMERCE_FEATURES.advanced,
-  ];
-
   return (
     <BaseSection>
-      <SectionTitle>Optional eCommerce Features</SectionTitle>
+      <SectionTitle>Select Features You Need</SectionTitle>
+      
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-        {allFeatures.map((feature: Feature) => (
+        {COMMERCE_FEATURES.map((feature) => (
           <CheckboxOption
             key={feature.id}
             id={feature.id}
-            checked={features[feature.id as keyof Features] || false}
-            onChange={(e) =>
-              handleFeatureChange(
-                feature.id as keyof Features,
-                e.target.checked
-              )
-            }
+            checked={features[feature.id] || false}
+            onChange={(e) => handleFeatureChange(feature.id, e.target.checked)}
             title={feature.label}
             description={feature.description}
           />

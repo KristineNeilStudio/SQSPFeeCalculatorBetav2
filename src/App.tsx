@@ -4,7 +4,6 @@ import NavigationBar from "./components/ui/NavigationBar";
 import AnnouncementBar from "./components/ui/AnnouncementBar";
 import CalculatorContainer from "./components/ui/CalculatorContainer";
 import VideoStorageCalculator from "./components/core/VideoStorageCalculator";
-import PlanSelector from "./components/ui/PlanSelector";
 import EnhancedFeatureRequirements from "./components/core/EnhancedFeatureRequirements";
 import BusinessMetricsSection from "./components/core/BusinessMetricsSection";
 import ResultsSection from "./components/core/ResultsSection";
@@ -17,16 +16,14 @@ import type { Metrics } from "./components/core/BusinessMetricsSection";
 interface FeeBreakdown {
   monthlySubscription: number;
   annualSubscription: number;
-  monthlyDpPlan?: number;
-  annualDpPlan?: number;
   processingFees: number;
   physicalPlatformFee?: number;
   digitalPlatformFee: number;
+  transactionFees?: number; // Added for the 2% Basic plan transaction fee
 }
 
 interface FeeResult {
   plan: string;
-  dpPlan?: string;
   processor: string;
   processors?: string[];
   isGrouped?: boolean;
@@ -36,7 +33,6 @@ interface FeeResult {
 }
 
 function App() {
-  const [planSet, setPlanSet] = useState<"current" | "new">("new");
   const [storageValue, setStorageValue] = useState("none");
   const [features, setFeatures] = useState<Features>({
     needsSubscriptions: false,
@@ -86,7 +82,6 @@ function App() {
         : 0;
 
     const eligibility = getEligiblePlans({
-      planSet,
       features,
       storageValue,
       monthlyPhysical,
@@ -98,111 +93,29 @@ function App() {
     // Calculate fees for all eligible combinations
     for (const plan of eligibility.plans) {
       for (const processor of filteredProcessors) {
-        if (planSet === "current") {
-          if (eligibility.dpPlanRequired) {
-            // If storage requires a specific minimum DP plan level, only calculate those options
-            const dpPlans = ["Starter", "Core", "Pro"] as const;
-            const validDpPlans = dpPlans.filter((dp) => {
-              if (eligibility.minDpPlan) {
-                switch (eligibility.minDpPlan) {
-                  case "Pro":
-                    return dp === "Pro";
-                  case "Core":
-                    return dp === "Core" || dp === "Pro";
-                  case "Starter":
-                    return true;
-                }
-              }
-              return true;
-            });
+        const fees = calculateTotalFees({
+          plan: plan as any,
+          monthlyPhysical,
+          monthlyDigital,
+          physicalTransactions,
+          digitalTransactions,
+          processorName: processor,
+        });
 
-            // Ensure we have at least one valid DP plan
-            if (validDpPlans.length === 0) {
-              // Default to using all DP plans if none match criteria
-              validDpPlans.push(...dpPlans);
-            }
-
-            for (const dpPlan of validDpPlans) {
-              const fees = calculateTotalFees({
-                plan: plan as any,
-                dpPlan,
-                monthlyPhysical,
-                monthlyDigital,
-                physicalTransactions,
-                digitalTransactions,
-                processorName: processor,
-                planSet,
-              });
-
-              results.push({
-                plan,
-                dpPlan,
-                processor,
-                monthlyCost: fees.monthlyCost,
-                annualCost: fees.annualCost,
-                breakdown: {
-                  monthlySubscription: fees.monthlySubscription,
-                  annualSubscription: fees.annualSubscription,
-                  processingFees: fees.processingFees,
-                  monthlyDpPlan: fees.dpPlanFee,
-                  annualDpPlan: fees.dpPlanFee,
-                  physicalPlatformFee: fees.physicalPlatformFees,
-                  digitalPlatformFee: fees.digitalPlatformFees,
-                },
-              });
-            }
-          } else {
-            // Calculate without DP plan
-            const fees = calculateTotalFees({
-              plan: plan as any,
-              monthlyPhysical,
-              monthlyDigital,
-              physicalTransactions,
-              digitalTransactions,
-              processorName: processor,
-              planSet,
-            });
-
-            results.push({
-              plan,
-              processor,
-              monthlyCost: fees.monthlyCost,
-              annualCost: fees.annualCost,
-              breakdown: {
-                monthlySubscription: fees.monthlySubscription,
-                annualSubscription: fees.annualSubscription,
-                processingFees: fees.processingFees,
-                physicalPlatformFee: fees.physicalPlatformFees,
-                digitalPlatformFee: fees.digitalPlatformFees,
-              },
-            });
-          }
-        } else {
-          // New plans don't use DP plans
-          const fees = calculateTotalFees({
-            plan: plan as any,
-            monthlyPhysical,
-            monthlyDigital,
-            physicalTransactions,
-            digitalTransactions,
-            processorName: processor,
-            planSet,
-          });
-
-          results.push({
-            plan,
-            processor,
-            monthlyCost: fees.monthlyCost,
-            annualCost: fees.annualCost,
-            breakdown: {
-              monthlySubscription: fees.monthlySubscription,
-              annualSubscription: fees.annualSubscription,
-              processingFees: fees.processingFees,
-              physicalPlatformFee: fees.physicalPlatformFees,
-              digitalPlatformFee: fees.digitalPlatformFees,
-            },
-          });
-        }
+        results.push({
+          plan,
+          processor,
+          monthlyCost: fees.monthlyCost,
+          annualCost: fees.annualCost,
+          breakdown: {
+            monthlySubscription: fees.monthlySubscription,
+            annualSubscription: fees.annualSubscription,
+            processingFees: fees.processingFees,
+            physicalPlatformFee: fees.physicalPlatformFees,
+            digitalPlatformFee: fees.digitalPlatformFees,
+            transactionFees: fees.transactionFees,
+          },
+        });
       }
     }
 
@@ -218,51 +131,42 @@ function App() {
   };
 
   const groupIdenticalCosts = (results: FeeResult[]): FeeResult[] => {
-    const grouped: FeeResult[] = [];
-    let currentGroup: FeeResult[] = [];
-
-    results.forEach((result, index) => {
-      if (index === 0) {
-        currentGroup = [result];
-      } else if (
-        result.monthlyCost === currentGroup[0].monthlyCost &&
-        result.plan === currentGroup[0].plan &&
-        result.dpPlan === currentGroup[0].dpPlan
-      ) {
-        currentGroup.push(result);
+    // Group results by plan, cost, and identical processors
+    const resultsByPlanAndCost: Record<string, FeeResult[]> = {};
+    
+    results.forEach(result => {
+      // Create a unique key for this plan and cost
+      const key = `${result.plan}-${result.monthlyCost.toFixed(2)}`;
+      
+      if (!resultsByPlanAndCost[key]) {
+        resultsByPlanAndCost[key] = [];
+      }
+      
+      resultsByPlanAndCost[key].push(result);
+    });
+    
+    // Convert grouped results to the final format
+    const groupedResults: FeeResult[] = [];
+    
+    Object.values(resultsByPlanAndCost).forEach(group => {
+      if (group.length === 1) {
+        // Single processor for this plan/cost
+        groupedResults.push(group[0]);
       } else {
-        if (currentGroup.length > 0) {
-          grouped.push(
-            currentGroup.length === 1
-              ? currentGroup[0]
-              : {
-                  ...currentGroup[0],
-                  processors: currentGroup.map((r) => r.processor),
-                  isGrouped: true,
-                }
-          );
-        }
-        currentGroup = [result];
+        // Multiple processors with identical costs - group them
+        groupedResults.push({
+          ...group[0],
+          processors: group.map(r => r.processor),
+          isGrouped: true
+        });
       }
     });
-
-    if (currentGroup.length > 0) {
-      grouped.push(
-        currentGroup.length === 1
-          ? currentGroup[0]
-          : {
-              ...currentGroup[0],
-              processors: currentGroup.map((r) => r.processor),
-              isGrouped: true,
-            }
-      );
-    }
-
-    return grouped;
+    
+    // Sort results by total cost
+    return groupedResults.sort((a, b) => a.monthlyCost - b.monthlyCost);
   };
 
   const handleReset = () => {
-    setPlanSet("new");
     setStorageValue("none");
     setFeatures({
       needsSubscriptions: false,
@@ -292,16 +196,13 @@ function App() {
       <NavigationBar />
       <main className="flex-grow">
         <CalculatorContainer>
-          <PlanSelector planSet={planSet} setPlanSet={setPlanSet} />
           <VideoStorageCalculator
-            planSet={planSet}
             storageValue={storageValue}
             onStorageChange={({ storage }) => setStorageValue(storage)}
           />
           <EnhancedFeatureRequirements
             features={features}
             setFeatures={setFeatures}
-            planSet={planSet}
           />
           <BusinessMetricsSection
             metrics={metrics}
