@@ -1,31 +1,23 @@
 // src/utils/feeCalculator.ts
 
 type ProcessorName = "Squarespace Payments" | "Stripe" | "PayPal";
-type PlanName =
-  | "Business"
-  | "Basic Commerce"
-  | "Advanced Commerce"
-  | "Core"
-  | "Plus"
-  | "Advanced";
-type DpPlanName = "Starter" | "Core" | "Pro";
+type PlanName = "Basic" | "Core" | "Plus" | "Advanced";
 
 interface PlanPricingStructure {
   monthly: number;
   annual: number;
   digitalFee?: number;
   physicalFee?: number;
+  transactionFee?: number; // Added for the 2% Basic plan transaction fee
 }
 
 interface FeeCalculationParams {
   plan: PlanName;
-  dpPlan?: DpPlanName;
   monthlyPhysical: number;
   monthlyDigital: number;
   physicalTransactions: number;
   digitalTransactions: number;
   processorName: ProcessorName;
-  planSet: "current" | "new";
 }
 
 interface FeeResult {
@@ -34,74 +26,41 @@ interface FeeResult {
   processingFees: number;
   digitalPlatformFees: number;
   physicalPlatformFees: number;
-  dpPlanFee: number;
+  transactionFees: number; // Added for the 2% Basic plan transaction fee
   monthlyCost: number;
   annualCost: number;
 }
 
-const PLAN_PRICING: {
-  current: Record<
-    "Business" | "Basic Commerce" | "Advanced Commerce",
-    PlanPricingStructure
-  >;
-  new: Record<"Core" | "Plus" | "Advanced", PlanPricingStructure>;
-} = {
-  current: {
-    Business: { monthly: 36, annual: 23, physicalFee: 0.03, digitalFee: 0.09 },
-    "Basic Commerce": {
-      monthly: 40,
-      annual: 28,
-      physicalFee: 0,
-      digitalFee: 0.09,
-    },
-    "Advanced Commerce": {
-      monthly: 72,
-      annual: 52,
-      physicalFee: 0,
-      digitalFee: 0.09,
-    },
+const PLAN_PRICING: Record<PlanName, PlanPricingStructure> = {
+  Basic: { 
+    monthly: 16, 
+    annual: 13, 
+    digitalFee: 0.10, 
+    transactionFee: 0.02 // 2% transaction fee for physical products
   },
-  new: {
-    Core: { monthly: 36, annual: 23, digitalFee: 0.05 },
-    Plus: { monthly: 56, annual: 39, digitalFee: 0.01 },
-    Advanced: { monthly: 139, annual: 99, digitalFee: 0 },
-  },
-};
-
-const DP_PLANS: Record<
-  DpPlanName,
-  {
-    monthly: number;
-    annual: number;
-    platformFee: number;
-  }
-> = {
-  Starter: { monthly: 12, annual: 9, platformFee: 0.07 },
-  Core: { monthly: 37, annual: 29, platformFee: 0.03 },
-  Pro: { monthly: 111, annual: 89, platformFee: 0 },
+  Core: { monthly: 36, annual: 23, digitalFee: 0.05 },
+  Plus: { monthly: 56, annual: 39, digitalFee: 0.01 },
+  Advanced: { monthly: 139, annual: 99, digitalFee: 0 }
 };
 
 const PROCESSORS: Record<
   ProcessorName,
   {
     transactionFee: number;
-    getRate: (planName: PlanName, isNewPlan: boolean) => number;
+    getRate: (planName: PlanName) => number;
   }
 > = {
   "Squarespace Payments": {
     transactionFee: 0.3,
-    getRate: (planName, isNewPlan) => {
-      if (isNewPlan) {
-        switch (planName) {
-          case "Plus":
-            return 0.027;
-          case "Advanced":
-            return 0.025;
-          default:
-            return 0.029;
-        }
+    getRate: (planName) => {
+      switch (planName) {
+        case "Plus":
+          return 0.027;
+        case "Advanced":
+          return 0.025;
+        default:
+          return 0.029;
       }
-      return 0.029;
     },
   },
   Stripe: {
@@ -117,20 +76,15 @@ const PROCESSORS: Record<
 export function calculateTotalFees(params: FeeCalculationParams): FeeResult {
   const {
     plan,
-    dpPlan,
     monthlyPhysical,
     monthlyDigital,
     physicalTransactions,
     digitalTransactions,
     processorName,
-    planSet,
   } = params;
 
   // Get base plan pricing
-  const planPricing =
-    planSet === "current"
-      ? PLAN_PRICING.current[plan as keyof typeof PLAN_PRICING.current]
-      : PLAN_PRICING.new[plan as keyof typeof PLAN_PRICING.new];
+  const planPricing = PLAN_PRICING[plan];
 
   // Calculate processing fees
   const processingFees = calculateProcessingFees(
@@ -139,45 +93,26 @@ export function calculateTotalFees(params: FeeCalculationParams): FeeResult {
     physicalTransactions,
     digitalTransactions,
     processorName,
-    plan,
-    planSet
+    plan
   );
 
   // Calculate platform fees
-  let digitalPlatformFees = 0;
-  let physicalPlatformFees = 0;
-  let dpPlanFee = 0;
-
-  if (planSet === "current") {
-    // Handle physical platform fees (only for Business plan)
-    if (plan === "Business") {
-      physicalPlatformFees = monthlyPhysical * (planPricing.physicalFee || 0);
-    }
-
-    // Handle digital platform fees
-    if (monthlyDigital > 0) {
-      if (dpPlan) {
-        // Use DP plan rate
-        const dpPlanInfo = DP_PLANS[dpPlan];
-        dpPlanFee = dpPlanInfo.monthly;
-        digitalPlatformFees = monthlyDigital * dpPlanInfo.platformFee;
-      } else {
-        // Use base plan rate
-        digitalPlatformFees = monthlyDigital * (planPricing.digitalFee || 0);
-      }
-    }
-  } else {
-    // New plans have digital platform fees built into the plan
-    digitalPlatformFees = monthlyDigital * (planPricing.digitalFee || 0);
-  }
-
+  const digitalPlatformFees = monthlyDigital * (planPricing.digitalFee || 0);
+  
+  // Calculate transaction fees (only applies to Basic plan for physical products)
+  const transactionFees = plan === "Basic" 
+    ? monthlyPhysical * (planPricing.transactionFee || 0)
+    : 0;
+  
+  const physicalPlatformFees = 0; // No physical platform fees in new plans
+  
   const monthlyCost = Number(
     (
       planPricing.monthly +
       processingFees +
       digitalPlatformFees +
       physicalPlatformFees +
-      dpPlanFee
+      transactionFees
     ).toFixed(2)
   );
 
@@ -187,7 +122,7 @@ export function calculateTotalFees(params: FeeCalculationParams): FeeResult {
       processingFees * 12 +
       digitalPlatformFees * 12 +
       physicalPlatformFees * 12 +
-      dpPlanFee * 12
+      transactionFees * 12
     ).toFixed(2)
   );
 
@@ -197,7 +132,7 @@ export function calculateTotalFees(params: FeeCalculationParams): FeeResult {
     processingFees,
     digitalPlatformFees,
     physicalPlatformFees,
-    dpPlanFee,
+    transactionFees,
     monthlyCost,
     annualCost,
   };
@@ -209,11 +144,10 @@ function calculateProcessingFees(
   physicalTransactions: number,
   digitalTransactions: number,
   processorName: ProcessorName,
-  planName: PlanName,
-  planSet: "current" | "new"
+  planName: PlanName
 ): number {
   const processor = PROCESSORS[processorName];
-  const processingRate = processor.getRate(planName, planSet === "new");
+  const processingRate = processor.getRate(planName);
   const totalVolume = monthlyPhysical + monthlyDigital;
   const totalTransactions = physicalTransactions + digitalTransactions;
 
