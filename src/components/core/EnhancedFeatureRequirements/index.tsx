@@ -1,6 +1,7 @@
 // src/components/core/EnhancedFeatureRequirements/index.tsx
 import React from "react";
 import { BaseSection, SectionTitle } from "../../ui/BaseSection";
+import type { Features } from "../../../utils/planEligibility";
 
 // Types
 interface Feature {
@@ -11,22 +12,10 @@ interface Feature {
   tier: "basic" | "core" | "plus";
 }
 
-export interface Features {
-  needsSubscriptions: boolean;
-  needsAbandonedCart: boolean;
-  needsAdvancedShipping: boolean;
-  sellsDigitalProducts: boolean;
-  needsPOS: boolean;
-  needsProductReviews: boolean;
-  needsAdvancedMerchandising: boolean;
-  needsLimitedAvailability: boolean;
-  needsAdvancedDiscounts: boolean;
-  needsCommerceAPI: boolean;
-}
-
 interface EnhancedFeatureRequirementsProps {
   features: Features;
-  setFeatures: (features: Features) => void;
+  // Update the type to accept a React state setter function
+  setFeatures: React.Dispatch<React.SetStateAction<Features>>;
 }
 
 // Feature definitions
@@ -137,10 +126,10 @@ const EnhancedFeatureRequirements: React.FC<
   EnhancedFeatureRequirementsProps
 > = ({ features, setFeatures }) => {
   const handleFeatureChange = (featureId: keyof Features, checked: boolean) => {
-    setFeatures({
-      ...features,
+    setFeatures(prevFeatures => ({
+      ...prevFeatures,
       [featureId]: checked,
-    });
+    }));
   };
 
   return (
@@ -151,7 +140,7 @@ const EnhancedFeatureRequirements: React.FC<
         {COMMERCE_FEATURES.map((feature) => (
           <CheckboxOption
             key={feature.id}
-            id={feature.id}
+            id={String(feature.id)}
             checked={features[feature.id] || false}
             onChange={(e) => handleFeatureChange(feature.id, e.target.checked)}
             title={feature.label}

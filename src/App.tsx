@@ -33,7 +33,8 @@ interface FeeResult {
 }
 
 function App() {
-  const [storageValue, setStorageValue] = useState("none");
+  // Default to 30min for Basic plan
+  const [storageValue, setStorageValue] = useState("30min");
   const [features, setFeatures] = useState<Features>({
     needsSubscriptions: false,
     needsAbandonedCart: false,
@@ -167,7 +168,7 @@ function App() {
   };
 
   const handleReset = () => {
-    setStorageValue("none");
+    setStorageValue("30min");
     setFeatures({
       needsSubscriptions: false,
       needsAbandonedCart: false,

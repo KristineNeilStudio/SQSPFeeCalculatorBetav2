@@ -5,6 +5,7 @@ import React from "react";
 interface StorageOption {
   value: string;
   label: string;
+  plans: string[];
 }
 
 interface VideoStorageCalculatorProps {
@@ -12,10 +13,28 @@ interface VideoStorageCalculatorProps {
   onStorageChange: (data: { storage: string }) => void;
 }
 
+// Updated storage options to include all plans with their corresponding storage limits
 const STORAGE_OPTIONS: StorageOption[] = [
-  { value: "none", label: "None (Up to 5 hours included)" },
-  { value: "5-50", label: "5-50 hours" },
-  { value: "50+", label: "Unlimited" },
+  { 
+    value: "30min", 
+    label: "Up to 30 minutes",
+    plans: ["Basic"]
+  },
+  { 
+    value: "5hours", 
+    label: "Up to 5 hours", 
+    plans: ["Core"] 
+  },
+  { 
+    value: "50hours", 
+    label: "Up to 50 hours", 
+    plans: ["Plus"] 
+  },
+  { 
+    value: "unlimited", 
+    label: "Unlimited", 
+    plans: ["Advanced"] 
+  },
 ];
 
 const VideoStorageCalculator: React.FC<VideoStorageCalculatorProps> = ({
@@ -42,6 +61,9 @@ const VideoStorageCalculator: React.FC<VideoStorageCalculatorProps> = ({
             </option>
           ))}
         </select>
+        <p className="text-xs text-gray-500 mt-1">
+          Your storage needs will help determine which plan is right for you.
+        </p>
       </div>
     </BaseSection>
   );

@@ -84,6 +84,7 @@ const ResultCard: React.FC<ResultCardProps> = ({ result, index }) => {
         </div>
 
         <div className="p-6">
+          {/* Fixed Costs */}
           <div className="mb-4">
             <div className="text-sm font-medium text-primary-medium mb-2">
               Fixed Costs
@@ -96,11 +97,13 @@ const ResultCard: React.FC<ResultCardProps> = ({ result, index }) => {
             </div>
           </div>
 
+          {/* Platform Fees */}
           <div className="mb-4">
             <div className="text-sm font-medium text-primary-medium mb-2">
               Platform Fees
             </div>
-            {result.breakdown.transactionFees && result.breakdown.transactionFees > 0 && (
+            {/* Transaction fees (Basic plan 2%) */}
+            {(result.breakdown.transactionFees !== undefined) && (
               <div className="flex justify-between text-sm text-primary-medium py-1">
                 <span>Online Store Transaction Fee (2%)</span>
                 <span className="font-mono">
@@ -108,24 +111,23 @@ const ResultCard: React.FC<ResultCardProps> = ({ result, index }) => {
                 </span>
               </div>
             )}
-            {(result.breakdown.physicalPlatformFee || 0) > 0 && (
-              <div className="flex justify-between text-sm text-primary-medium py-1">
-                <span>Physical Product Platform Fee</span>
-                <span className="font-mono">
-                  ${formatCurrency(result.breakdown.physicalPlatformFee)}
-                </span>
-              </div>
-            )}
-            {result.breakdown.digitalPlatformFee > 0 && (
-              <div className="flex justify-between text-sm text-primary-medium py-1">
-                <span>Digital Product Platform Fee</span>
-                <span className="font-mono">
-                  ${formatCurrency(result.breakdown.digitalPlatformFee)}
-                </span>
-              </div>
-            )}
+            {/* Always render physical platform fee (even if 0) */}
+            <div className="flex justify-between text-sm text-primary-medium py-1">
+              <span>Physical Product Platform Fee</span>
+              <span className="font-mono">
+                ${formatCurrency(result.breakdown.physicalPlatformFee || 0)}
+              </span>
+            </div>
+            {/* Always render digital platform fee (even if 0) */}
+            <div className="flex justify-between text-sm text-primary-medium py-1">
+              <span>Digital Product Platform Fee</span>
+              <span className="font-mono">
+                ${formatCurrency(result.breakdown.digitalPlatformFee)}
+              </span>
+            </div>
           </div>
 
+          {/* Processing Fees */}
           <div className="mb-4">
             <div className="text-sm font-medium text-primary-medium mb-2">
               Processing Fees
@@ -138,6 +140,7 @@ const ResultCard: React.FC<ResultCardProps> = ({ result, index }) => {
             </div>
           </div>
 
+          {/* Total */}
           <div className="flex justify-between pt-4 border-t border-ui-border text-primary-darkest font-semibold">
             <span>Total</span>
             <span>${formatCurrency(result.monthlyCost)}</span>
@@ -145,6 +148,7 @@ const ResultCard: React.FC<ResultCardProps> = ({ result, index }) => {
         </div>
       </div>
 
+      {/* Annual Savings Alert */}
       {index === 0 && result.monthlyCost * 12 - result.annualCost > 0 && (
         <div className="-mt-[1px] bg-ui-backgroundShade border border-ui-border border-t-0 rounded-b-lg overflow-hidden">
           <div className="p-6 flex gap-3">

@@ -1,10 +1,37 @@
 // src/components/ui/BaseSection.tsx
-export const BaseSection = ({
-  children,
-  className = "",
-}: {
+import React from 'react';
+
+interface BaseSectionProps {
   children: React.ReactNode;
   className?: string;
+}
+
+interface SectionTitleProps {
+  children: React.ReactNode;
+}
+
+interface SubsectionTitleProps {
+  children: React.ReactNode;
+}
+
+interface MoneyDisplayProps {
+  amount: number;
+  size?: "normal" | "large";
+}
+
+interface CalculateButtonProps {
+  onClick: () => void;
+  disabled?: boolean;
+  loading?: boolean;
+}
+
+interface RecommendedFlagProps {
+  children: React.ReactNode;
+}
+
+export const BaseSection: React.FC<BaseSectionProps> = ({
+  children,
+  className = "",
 }) => (
   <div
     className={`bg-white rounded-lg shadow-calculator p-6 mb-8 ${className}`}
@@ -13,28 +40,23 @@ export const BaseSection = ({
   </div>
 );
 
-export const SectionTitle = ({ children }: { children: React.ReactNode }) => (
+export const SectionTitle: React.FC<SectionTitleProps> = ({ children }) => (
   <h2 className="text-xl font-semibold text-primary-darkest mb-6">
     {children}
   </h2>
 );
 
-export const SubsectionTitle = ({
+export const SubsectionTitle: React.FC<SubsectionTitleProps> = ({
   children,
-}: {
-  children: React.ReactNode;
 }) => (
   <div className="text-sm font-semibold text-primary-darkest border-l-2 border-accent-red pl-2 mb-2">
     {children}
   </div>
 );
 
-export const MoneyDisplay = ({
+export const MoneyDisplay: React.FC<MoneyDisplayProps> = ({
   amount,
   size = "normal",
-}: {
-  amount: number;
-  size?: "normal" | "large";
 }) => {
   const formatted = amount.toLocaleString("en-US", {
     minimumFractionDigits: 2,
@@ -48,14 +70,10 @@ export const MoneyDisplay = ({
   );
 };
 
-export const CalculateButton = ({
+export const CalculateButton: React.FC<CalculateButtonProps> = ({
   onClick,
   disabled,
   loading,
-}: {
-  onClick: () => void;
-  disabled?: boolean;
-  loading?: boolean;
 }) => (
   <button
     onClick={onClick}
@@ -72,10 +90,8 @@ export const CalculateButton = ({
   </button>
 );
 
-export const RecommendedFlag = ({
+export const RecommendedFlag: React.FC<RecommendedFlagProps> = ({
   children,
-}: {
-  children: React.ReactNode;
 }) => (
   <div
     className="absolute -top-px right-6 bg-accent-red text-white px-3 py-1.5 

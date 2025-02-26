@@ -11,6 +11,12 @@ export interface Features {
   needsLimitedAvailability: boolean;
   needsAdvancedDiscounts: boolean;
   needsCommerceAPI: boolean;
+  // Additional properties that may be used elsewhere in the app
+  needsAdvancedAnalytics?: boolean;
+  needsCustomCode?: boolean;
+  needsShippingLabels?: boolean;
+  needsCarrierRates?: boolean;
+  [key: string]: boolean | undefined; // Allow for any additional boolean properties
 }
 
 interface EligiblePlansParams {
@@ -42,25 +48,23 @@ const CORE_TIER_FEATURES = [
   "needsAdvancedMerchandising"
 ] as const;
 
+// Map storage values to minimum plan requirements
+const STORAGE_PLAN_REQUIREMENTS: Record<string, string[]> = {
+  "30min": ["Basic", "Core", "Plus", "Advanced"],
+  "5hours": ["Core", "Plus", "Advanced"],
+  "50hours": ["Plus", "Advanced"],
+  "unlimited": ["Advanced"]
+};
+
 export function getEligiblePlans(
   params: EligiblePlansParams
 ): EligiblePlansResult {
-  const { features, storageValue } = params;
+  const { features, storageValue, monthlyPhysical, monthlyDigital } = params;
   const requiredFeatures: string[] = [];
   
   // Check storage requirements first
-  let storageBasedPlans: string[];
-  switch (storageValue) {
-    case "50+":
-      storageBasedPlans = ["Advanced"];
-      break;
-    case "5-50":
-      storageBasedPlans = ["Plus", "Advanced"];
-      break;
-    default:
-      storageBasedPlans = ["Basic", "Core", "Plus", "Advanced"];
-      break;
-  }
+  const storageBasedPlans = STORAGE_PLAN_REQUIREMENTS[storageValue] || 
+    ["Basic", "Core", "Plus", "Advanced"]; // Default to all plans if storage value not recognized
 
   // Check for features requiring Plus or above
   const requiresPlus = PLUS_TIER_FEATURES.some(
@@ -106,8 +110,8 @@ export function getEligiblePlans(
   return {
     plans,
     requiredFeatures,
-    requiresAdvanced: storageValue === "50+",
-    requiresPlus,
-    requiresCore
+    requiresAdvanced: storageValue === "unlimited",
+    requiresPlus: storageValue === "50hours" || requiresPlus,
+    requiresCore: storageValue === "5hours" || requiresCore
   };
 }
