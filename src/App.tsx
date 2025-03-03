@@ -1,12 +1,12 @@
 // src/App.tsx
 import { useState, useRef } from "react";
-import NavigationBar from "./components/ui/NavigationBar";
 import AnnouncementBar from "./components/ui/AnnouncementBar";
 import CalculatorContainer from "./components/ui/CalculatorContainer";
 import VideoStorageCalculator from "./components/core/VideoStorageCalculator";
 import EnhancedFeatureRequirements from "./components/core/EnhancedFeatureRequirements";
 import BusinessMetricsSection from "./components/core/BusinessMetricsSection";
 import ResultsSection from "./components/core/ResultsSection";
+import ComparisonPage from "./components/core/ComparisonPage";
 import { calculateTotalFees } from "./utils/feeCalculator";
 import { getEligiblePlans } from "./utils/planEligibility";
 import Footer from "./components/ui/Footer";
@@ -191,42 +191,62 @@ function App() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
+  // The main calculator UI - not changing anything about the existing functionality
+  const calculatorContent = (
+    <>
+      <VideoStorageCalculator
+        storageValue={storageValue}
+        onStorageChange={({ storage }) => setStorageValue(storage)}
+      />
+      <EnhancedFeatureRequirements
+        features={features}
+        setFeatures={setFeatures}
+      />
+      <BusinessMetricsSection
+        metrics={metrics}
+        setMetrics={setMetrics}
+        onReset={handleReset}
+        onCalculate={calculateFees}
+        calculateDisabled={
+          (!metrics.monthlyPhysical && !metrics.monthlyDigital) || // No revenue entered
+          (Number(metrics.monthlyPhysical) > 0 &&
+            !metrics.avgPhysicalOrder) || // Physical revenue but no AOV
+          (Number(metrics.monthlyDigital) > 0 && !metrics.avgDigitalOrder) // Digital revenue but no AOV
+        }
+      />
+      {feeResults && (
+        <ResultsSection
+          ref={resultsRef}
+          feeResults={feeResults}
+          onReset={handleReset}
+        />
+      )}
+    </>
+  );
+
+  // The comparison view
+  const comparisonContent = (
+    <ComparisonPage />
+  );
+
+  // Updated announcement for the new comparison feature
+  const comparisonAnnouncementMessage = "NEW: Compare all Squarespace fees side-by-side with our Fee Comparison tool!";
+
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
-      <AnnouncementBar />
-      <NavigationBar />
+      <AnnouncementBar message={comparisonAnnouncementMessage} />
       <main className="flex-grow">
-        <CalculatorContainer>
-          <VideoStorageCalculator
-            storageValue={storageValue}
-            onStorageChange={({ storage }) => setStorageValue(storage)}
-          />
-          <EnhancedFeatureRequirements
-            features={features}
-            setFeatures={setFeatures}
-          />
-          <BusinessMetricsSection
-            metrics={metrics}
-            setMetrics={setMetrics}
-            onReset={handleReset}
-            onCalculate={calculateFees}
-            calculateDisabled={
-              (!metrics.monthlyPhysical && !metrics.monthlyDigital) || // No revenue entered
-              (Number(metrics.monthlyPhysical) > 0 &&
-                !metrics.avgPhysicalOrder) || // Physical revenue but no AOV
-              (Number(metrics.monthlyDigital) > 0 && !metrics.avgDigitalOrder) // Digital revenue but no AOV
-            }
-          />
-          {feeResults && (
-            <ResultsSection
-              ref={resultsRef}
-              feeResults={feeResults}
-              onReset={handleReset}
-            />
-          )}
+        <CalculatorContainer
+          comparisonView={comparisonContent}
+        >
+          {calculatorContent}
         </CalculatorContainer>
       </main>
-      <Footer />
+      <Footer 
+        feedbackUrl="https://sqsfeecalculator-feedback.paperform.co/"
+        mainSiteUrl="https://kristineneil.com"
+        courseUrl="https://resources.kristineneil.com/web-designers-guide-squarespace-payments"
+      />
     </div>
   );
 }
