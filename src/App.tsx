@@ -230,7 +230,7 @@ function App() {
   );
 
   // Updated announcement for the new comparison feature
-  const comparisonAnnouncementMessage = "NEW: Compare all Squarespace fees side-by-side with our Fee Comparison tool!";
+  const comparisonAnnouncementMessage = "NEW: See all Squarespace fees side-by-side and get savings tips with the new Comparison Mode!";
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
