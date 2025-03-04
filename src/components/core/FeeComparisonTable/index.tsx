@@ -262,64 +262,7 @@ const FeeComparisonTable: React.FC = () => {
           </tbody>
         </table>
       </div>
-      
-      {/* Key Features List */}
-      <div className="mt-8">
-        <h3 className="text-lg font-semibold mb-4">KEY FEATURES BY PLAN LEVEL</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {planNames.map(plan => (
-            <div key={`features-${plan}`} className="bg-white border rounded-lg p-4">
-              <h4 className="font-semibold text-center mb-3">{plan.toUpperCase()}</h4>
-              <ul className="space-y-2">
-                {plan === 'Basic' && (
-                  <>
-                    <FeatureItem available>Basic eCommerce capabilities</FeatureItem>
-                    <FeatureItem available>Unlimited products</FeatureItem>
-                    <FeatureItem available={false}>Point of Sale</FeatureItem>
-                    <FeatureItem available={false}>Gift cards</FeatureItem>
-                    <FeatureItem available={false}>Advanced shipping</FeatureItem>
-                    <FeatureItem available={false}>Subscription products</FeatureItem>
-                    <FeatureItem available={false}>Commerce API</FeatureItem>
-                  </>
-                )}
-                {plan === 'Core' && (
-                  <>
-                    <FeatureItem available>Basic eCommerce capabilities</FeatureItem>
-                    <FeatureItem available>Unlimited products</FeatureItem>
-                    <FeatureItem available>Point of Sale</FeatureItem>
-                    <FeatureItem available>Gift cards</FeatureItem>
-                    <FeatureItem available>Customer accounts</FeatureItem>
-                    <FeatureItem available>Product reviews</FeatureItem>
-                    <FeatureItem available={false}>Abandoned cart recovery</FeatureItem>
-                    <FeatureItem available={false}>Subscription products</FeatureItem>
-                    <FeatureItem available={false}>Commerce API</FeatureItem>
-                  </>
-                )}
-                {plan === 'Plus' && (
-                  <>
-                    <FeatureItem available>All Core features</FeatureItem>
-                    <FeatureItem available>Abandoned cart recovery</FeatureItem>
-                    <FeatureItem available>Advanced shipping</FeatureItem>
-                    <FeatureItem available>Subscription products</FeatureItem>
-                    <FeatureItem available>Commerce API</FeatureItem>
-                    <FeatureItem available>Advanced discounts</FeatureItem>
-                  </>
-                )}
-                {plan === 'Advanced' && (
-                  <>
-                    <FeatureItem available>All Plus features</FeatureItem>
-                    <FeatureItem available>0% transaction fees on all products</FeatureItem>
-                    <FeatureItem available>Wholesale commerce</FeatureItem>
-                    <FeatureItem available>Advanced shipping</FeatureItem>
-                    <FeatureItem available>Subscription products</FeatureItem>
-                    <FeatureItem available>Commerce API</FeatureItem>
-                  </>
-                )}
-              </ul>
-            </div>
-          ))}
-        </div>
-      </div>
+
     </div>
   );
 };
