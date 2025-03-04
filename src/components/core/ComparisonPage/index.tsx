@@ -25,17 +25,6 @@ const ComparisonPage: React.FC = () => {
       {/* Fee Impact Guide */}
       <FeeImpactGuide />
       
-      {/* Calculator Promotion */}
-      <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
-        <h3 className="font-semibold text-gray-900 mb-2 flex items-center gap-2">
-          <Calculator className="w-5 h-5" />
-          Need a personalized recommendation?
-        </h3>
-        <p className="text-sm text-gray-700">
-          If you'd like a custom calculation based on your specific business needs and 
-          revenue numbers, switch to <strong>Calculator Mode</strong> using the toggle at the top of the page.
-        </p>
-      </div>
       
       {/* FAQ Section */}
       <FAQSection />
