@@ -160,10 +160,9 @@ const FAQSection: React.FC = () => {
       </div>
       
       <div className="mt-8 p-4 bg-gray-50 rounded-lg border border-gray-200">
-        <h3 className="font-semibold text-gray-900 mb-2">Have a question not covered here?</h3>
+        <h3 className="font-semibold text-gray-900 mb-2">Wondering how your numbers stack up?</h3>
         <p className="text-sm text-gray-700">
-          If you have a specific question about Squarespace fees that you'd like answered,
-          switch to <strong>Calculator Mode</strong> using the toggle at the top of the page for 
+          Switch over to <strong>Calculator Mode</strong> using the toggle at the top of the page for 
           a personalized recommendation based on your specific business needs.
         </p>
       </div>
