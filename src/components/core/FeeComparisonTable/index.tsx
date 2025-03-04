@@ -137,8 +137,7 @@ const FeeComparisonTable: React.FC = () => {
 
   return (
     <div>
-      <h2 className="text-xl font-semibold text-gray-900 mb-6">SQUARESPACE FEE COMPARISON</h2>
-      
+      {/* Annual Pricing Toggle */}
       <div className="mb-6 flex justify-end">
         <label className="inline-flex items-center cursor-pointer">
           <input
