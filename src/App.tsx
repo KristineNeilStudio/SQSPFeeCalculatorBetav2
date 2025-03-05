@@ -230,7 +230,10 @@ function App() {
   );
 
   // Updated announcement for the new comparison feature
-  const comparisonAnnouncementMessage = "NEW: See all Squarespace fees side-by-side and get savings tips with the new Comparison Mode!";
+  const temporarilyHideComparison = true;
+const comparisonAnnouncementMessage = temporarilyHideComparison 
+  ? undefined // Use default message in AnnouncementBar
+  : "NEW: See all Squarespace fees side-by-side and get savings tips with the new Comparison Mode!";
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">

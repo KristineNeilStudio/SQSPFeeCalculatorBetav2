@@ -12,6 +12,9 @@ const CalculatorContainer: React.FC<CalculatorContainerProps> = ({
   comparisonView,
 }) => {
   const [mode, setMode] = useState<"calculator" | "comparison">("calculator");
+  
+  // Add this flag to temporarily hide the toggle
+  const temporarilyHideToggle = true;
 
   return (
     <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -24,7 +27,7 @@ const CalculatorContainer: React.FC<CalculatorContainerProps> = ({
             </span>
           </h2>
           
-          {comparisonView && (
+          {comparisonView && !temporarilyHideToggle && (
             <div className="inline-flex rounded-md shadow-sm" role="group">
               <button
                 onClick={() => setMode("calculator")}
@@ -52,7 +55,8 @@ const CalculatorContainer: React.FC<CalculatorContainerProps> = ({
           )}
         </div>
         
-        {mode === "calculator" ? children : comparisonView}
+        {/* Always show calculator mode while toggle is hidden */}
+        {temporarilyHideToggle ? children : (mode === "calculator" ? children : comparisonView)}
       </div>
     </main>
   );
