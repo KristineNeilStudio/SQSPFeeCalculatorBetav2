@@ -62,7 +62,7 @@ const Footer: React.FC<FooterProps> = ({
                 </li>
                 <li>
                   <a
-                    href="https://resources.kristineneil.com/squarespace-fee-calculator"
+                    href="kristineneil.com"
                     className="inline-flex items-center text-sm text-gray-600 
                              hover:text-gray-900 transition-colors duration-200 gap-1"
                   >
