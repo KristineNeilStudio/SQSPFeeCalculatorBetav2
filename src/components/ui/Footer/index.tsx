@@ -3,56 +3,18 @@ import React from "react";
 import { ArrowRight, ExternalLink } from "lucide-react";
 
 interface FooterProps {
-  courseUrl?: string;
   mainSiteUrl?: string;
   feedbackUrl?: string;
   year?: number;
 }
 
 const Footer: React.FC<FooterProps> = ({
-  courseUrl = "https://resources.kristineneil.com/web-designers-guide-squarespace-payments",
   mainSiteUrl = "https://kristineneil.com",
   feedbackUrl = "https://sqsfeecalculator-feedback.paperform.co/",
   year = new Date().getFullYear(),
 }) => {
   return (
     <footer className="w-full bg-gray-50">
-      {/* Course Promotion Section */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="bg-gray-100 rounded-xl p-8 lg:p-12 my-12 relative overflow-hidden">
-          {/* Decorative background pattern */}
-          <div className="absolute inset-0 opacity-5">
-            <div className="absolute inset-0 bg-gray-800 transform -skew-y-12"></div>
-          </div>
-
-          <div className="relative z-10">
-            <div className="max-w-4xl mx-auto text-center">
-              <h2 className="text-2xl md:text-3xl font-semibold text-gray-900 mb-6">
-                READY TO MASTER THE STRATEGY BEHIND THE CALCULATOR?
-              </h2>
-              <p className="text-base md:text-lg text-gray-700 mb-8 leading-relaxed">
-                Transform your Squarespace web design services with The Complete
-                Guide to Squarespace Payments. Learn exactly{" "}
-                <strong>why</strong> certain payment setups work better than
-                others, and use these insights to provide even more value to
-                your clients.
-              </p>
-              <a
-                href={courseUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center justify-center px-8 py-4 bg-gray-800 
-                         hover:bg-gray-700 text-white rounded-lg transition-all duration-200 
-                         group gap-3 text-base font-medium hover:shadow-lg hover:-translate-y-0.5"
-              >
-                Get The Course Details
-                <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-0.5" />
-              </a>
-            </div>
-          </div>
-        </div>
-      </div>
-
       {/* Main Footer Section */}
       <div className="border-t border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -100,7 +62,7 @@ const Footer: React.FC<FooterProps> = ({
                 </li>
                 <li>
                   <a
-                    href="https://resources.kristineneil.com/squarespace-fee-calculator"
+                    href="https://sqsfeecalculator-feedback.paperform.co/"
                     className="inline-flex items-center text-sm text-gray-600 
                              hover:text-gray-900 transition-colors duration-200 gap-1"
                   >
@@ -110,7 +72,7 @@ const Footer: React.FC<FooterProps> = ({
                 </li>
                 <li>
                   <a
-                    href={`${mainSiteUrl}/contact`}
+                    href="kristineneil.com"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center text-sm text-gray-600 
