@@ -62,16 +62,6 @@ const Footer: React.FC<FooterProps> = ({
                 </li>
                 <li>
                   <a
-                    href="kristineneil.com"
-                    className="inline-flex items-center text-sm text-gray-600 
-                             hover:text-gray-900 transition-colors duration-200 gap-1"
-                  >
-                    <ExternalLink className="w-4 h-4" />
-                    Return to Main Site
-                  </a>
-                </li>
-                <li>
-                  <a
                     href={`${mainSiteUrl}/contact`}
                     target="_blank"
                     rel="noopener noreferrer"
