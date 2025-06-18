@@ -248,7 +248,6 @@ const comparisonAnnouncementMessage = temporarilyHideComparison
       <Footer 
         feedbackUrl="https://sqsfeecalculator-feedback.paperform.co/"
         mainSiteUrl="https://kristineneil.com"
-        courseUrl="https://resources.kristineneil.com/web-designers-guide-squarespace-payments"
       />
     </div>
   );
