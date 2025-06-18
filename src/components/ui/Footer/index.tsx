@@ -62,7 +62,7 @@ const Footer: React.FC<FooterProps> = ({
                 </li>
                 <li>
                   <a
-                    href="https://sqsfeecalculator-feedback.paperform.co/"
+                    href="https://resources.kristineneil.com/squarespace-fee-calculator"
                     className="inline-flex items-center text-sm text-gray-600 
                              hover:text-gray-900 transition-colors duration-200 gap-1"
                   >
@@ -72,7 +72,7 @@ const Footer: React.FC<FooterProps> = ({
                 </li>
                 <li>
                   <a
-                    href="kristineneil.com"
+                    href={`${mainSiteUrl}/contact`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center text-sm text-gray-600 
